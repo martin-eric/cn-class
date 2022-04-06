@@ -10,6 +10,7 @@ else
         sudo sed -i 's/^\/swap/#&/g' /etc/fstab
         touch ~/.rebooted
         sudo shutdown -r +0 "Rebooting.... Reconnect to this terminal in 1 min and redo the previous command..."
+        exit
 
 fi
 
