@@ -112,6 +112,9 @@ sudo systemctl status containerd.service
 sudo systemctl enable kubelet.service
 sudo systemctl enable containerd.service
 
+if [$HOSTNAME == "my-ubuntu-1"]; then
+
+    echo "KUBE1 is detected, continue with control plane"
 
 #0 - Creating a Cluster
 #Create our kubernetes cluster, specify a pod network range matching that in calico.yaml! 
@@ -160,5 +163,8 @@ echo "the join command on all worker nodes is " && cat ~/.kjoin
 
 echo "**** FINISHED ****"
 
+else
 
+    echo "*** worker node detected, use the join command from the control plane output ***"
 
+fi
