@@ -1,7 +1,17 @@
-#0 - Disable swap, swapoff then edit your fstab removing any entry for swap partitions
-#You can recover the space with fdisk. You may want to reboot to ensure your config is ok. 
-sudo swapoff -a
-sudo sed -i 's/^\/swap/#&/g' /etc/fstab
+FILE=~/.rebooted
+
+if [ -f "$FILE" ]; then
+    echo "$FILE exists. Continue"
+else
+    echo "$FILE does not exist."
+        #0 - Disable swap, swapoff then edit your fstab removing any entry for swap partitions
+        #You can recover the space with fdisk. You may want to reboot to ensure your config is ok. 
+        sudo swapoff -a
+        sudo sed -i 's/^\/swap/#&/g' /etc/fstab
+        touch ~/.rebooted
+        sudo reboot
+
+fi
 
 ###IMPORTANT####
 #I expect this code to change a bit to make the installation process more streamlined.
@@ -115,10 +125,10 @@ wget https://docs.projectcalico.org/manifests/calico.yaml
 #vi calico.yaml
 
 ##IMPORTANT UPDATE - 27 Dec 2022##
-#kubeadm 1.22 removed the need to use the parameters --config=ClusterConfiguration.yaml and --cri-socket /run/containerd/containerd.sock
+#kubeadm 1.22 removed the need to use the parameters --config=ClusterConfiguration.yaml and --cri-set /run/containerd/containerd.sock
 #You can now just use kubeadm init to bootstrap the cluster
 
-sudo kubeadm init
+sudo kubeadm init | tee ~/.kinit
 
 #Before moving on review the output of the cluster creation process including the kubeadm init phases, 
 #the admin.conf setup and the node join command
@@ -129,6 +139,7 @@ mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
+echo -n "sudo " > ~/.kjoin && cat ~/.kinit | egrep 'kubeadm join|discovery-token-ca-cert-hash' >> ~/.kjoin
 
 #1 - Creating a Pod Network
 #Deploy yaml file for your pod network.
@@ -142,3 +153,12 @@ kubectl get pods --all-namespaces
 
 #Get a list of our current nodes, just the Control Plane Node/Master Node...should be Ready.
 kubectl get nodes 
+
+echo "**** FINISHED ****"
+
+echo "the join command on all worker nodes is " && cat ~/.kjoin
+
+echo "**** FINISHED ****"
+
+
+
