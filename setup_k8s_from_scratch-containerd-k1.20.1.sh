@@ -1,3 +1,5 @@
+echo "**** Starting ****"
+
 FILE=~/.rebooted
 
 if [ -f "$FILE" ]; then
@@ -9,7 +11,8 @@ else
         sudo swapoff -a
         sudo sed -i 's/^\/swap/#&/g' /etc/fstab
         touch ~/.rebooted
-        sudo shutdown -r +0 "Rebooting.... Reconnect to this terminal in 1 min and redo the previous command..."
+        echo "Rebooting.... Reconnect to this terminal in 1 min and redo the previous command..."
+        sudo reboot
         exit
 
 fi
@@ -87,7 +90,7 @@ EOF'
 
 #Update the package list and use apt-cache policy to inspect versions available in the repository
 sudo apt-get update
-apt-cache policy kubelet | head -n 20 
+#apt-cache policy kubelet | head -n 20 
 
 
 #Install the required packages, if needed we can request a specific version. 
@@ -105,8 +108,8 @@ sudo apt-mark hold kubelet kubeadm kubectl containerd
 #1 - systemd Units
 #Check the status of our kubelet and our container runtime, containerd.
 #The kubelet will enter a crashloop until a cluster is created or the node is joined to an existing cluster.
-sudo systemctl status kubelet.service 
-sudo systemctl status containerd.service 
+#sudo systemctl status kubelet.service 
+#sudo systemctl status containerd.service 
 
 
 #Ensure both are set to start when the system starts up.
@@ -169,5 +172,6 @@ echo "**** FINISHED ****"
 else
 
     echo "*** worker node detected, use the join command from the control plane output ***"
+    echo "--> you can use the following command on the control plane node : cat ~/.kjoin "
 
 fi
