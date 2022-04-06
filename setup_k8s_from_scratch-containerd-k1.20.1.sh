@@ -113,7 +113,9 @@ sudo systemctl status containerd.service
 sudo systemctl enable kubelet.service
 sudo systemctl enable containerd.service
 
-if [$HOSTNAME == "my-ubuntu-1"]; then
+if [ $HOSTNAME == "my-ubuntu-1" ]
+
+then
 
     echo "KUBE1 is detected, continue with control plane"
 
