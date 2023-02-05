@@ -1,5 +1,7 @@
-SCRIPTV="0.2"
+SCRIPTV="0.3"
 FILE=~/.myself
+
+echo "Starting script version $SCRIPTV"
 
 if [[ $EUID -eq 0 ]]; then
         echo "You cannot be a root user. " 2>&1
@@ -39,9 +41,9 @@ read -p "Confirm the information looks correct ? (y or n) " -n 1 -r
 echo    # (optional) move to a new line
 if [[ ! $REPLY =~ ^[Yy]$ ]]
 then
+        echo "Cancelling changes..."
         exit 1
 fi
-
 
 #export PS1="$NEWPS1 $PS1"
 echo "$NEWPS1" > ~/.myself
