@@ -1,31 +1,48 @@
-SCRIPTV="0.3"
+SCRIPTV="0.4"
 FILE=.swapoff
+FILE2=.binariesdone
+
+echo "Starting script version $SCRIPTV"
 
 if [[ $EUID -ne 0 ]]; then
   echo "You must be a root user. Use SUDO " 2>&1
   exit 1
 fi
 
-
-
 if [ -f "$FILE" ]; then
 
     echo "$FILE exists. Continue"
 
 else
-    echo "$FILE does not exist. RELAUNCH install script after the reboot"
+    echo "$FILE does not exist. RELAUNCH install script after the reboot. Please login after you see the login prompt for this note on the console"
         sudo swapoff -a
         sudo sed -i  's/\/swap/#\/swap/' /etc/fstab
         touch .swapoff
         sleep 5
         sudo reboot
-
+  echo "Rebooting ....."
 fi
 
+if [ -f "$FILE2" ]; then
 
+    echo "$FILE2 exists. Look like the cluster binaries are installed, starting the cluster for you..."
+    
+    sudo kubeadm init | tee .clusterstartoutput && mkdir -p $HOME/.kube && sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config && sudo chown $(id -u):$(id -g) $HOME/.kube/config
+    
+    kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+    
+    echo && echo && echo "Cluster initialize completed. You join command for your worker nodes is :"
+    
+    echo -n "sudo " && kubeadm token create --print-join-command
+    
+    exit
 
+else
+    echo "$FILE2 does not exist. Installing all the binaries for your cluster"
+        sleep 5
+fi
 
-#0 - Joining Nodes to a Cluster
+# Installing all binaries, including latest containerd from docker repo 
 
 #Install a container runtime - containerd
 #containerd prerequisites, first load two modules and configure them to load on boot
@@ -122,4 +139,10 @@ sudo apt-mark hold kubelet kubeadm kubectl containerd.io
 #Ensure both are set to start when the system starts up.
 sudo systemctl enable kubelet.service
 sudo systemctl enable containerd.service
+
+echo "kubernetes binaries all installed.... You are ready to manually initialize the cluster."
+
+touch .binariesdone
+
+echo "If you want this script to do it for you, launch it again and it will do the following for you: initialize it, set-up your kubectl, and process the calico file for you"
 
