@@ -27,7 +27,7 @@ if [ -f "$FILE2" ]; then
 
     echo "$FILE2 exists. Look like the cluster binaries are installed, starting the cluster for you..."
     
-    sudo kubeadm init | tee .clusterstartoutput && mkdir -p $HOME/.kube && sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config && sudo chown $(id -u):$(id -g) $HOME/.kube/config
+    sudo kubeadm init | tee .clusterstartoutput && sudo mkdir -p $HOME/.kube && sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config && sudo chown $(id -u):$(id -g) $HOME/.kube/config
     
     kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
     
