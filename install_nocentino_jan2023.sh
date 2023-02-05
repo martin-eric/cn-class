@@ -27,13 +27,13 @@ if [ -f "$FILE2" ]; then
 
     echo "$FILE2 exists. Look like the cluster binaries are installed, starting the cluster for you..."
     
-    sudo kubeadm init | tee .clusterstartoutput && sudo mkdir -p $HOME/.kube && sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config && sudo chown $(id -u):$(id -g) $HOME/.kube/config
+    sudo kubeadm init | tee .clusterstartoutput && sudo mkdir -p $HOME/.kube && sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config && sudo chown ericsson:ericsson $HOME/.kube/config
     
     kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
     
     echo && echo && echo "Cluster initialize completed. You join command for your worker nodes is :"
     
-    echo -n "sudo " && kubeadm token create --print-join-command
+    echo -n "sudo kubeadm reset ; sudo " && kubeadm token create --print-join-command
     
     exit
 
