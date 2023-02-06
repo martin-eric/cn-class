@@ -98,7 +98,7 @@ echo \
 #Remove containerd if already installed
 
 sudo apt-mark unhold containerd
-sudo apt remove containerd
+sudo apt remove -y containerd
 sudo rm -rf /etc/containerd/config.toml
 
 #Install containerd from docker registery
@@ -136,7 +136,7 @@ apt-cache policy kubelet | head -n 20
 
 #Install the required packages, if needed we can request a specific version. 
 #Pick the same version you used on the Control Plane Node in 0-PackageInstallation-containerd.sh
-VERSION=1.22.4-00
+VERSION=1.23.4-00
 sudo apt-get install -y kubelet=$VERSION kubeadm=$VERSION kubectl=$VERSION
 sudo apt-mark hold kubelet kubeadm kubectl containerd.io
 
