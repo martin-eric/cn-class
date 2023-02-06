@@ -25,7 +25,7 @@ fi
 
 if [ -f "$FILE2" ] ; then
 
-    if [[(hostname -s) =~ /my-ubuntu-1/ ]]; then
+    if [[ (hostname -s) =~ /my-ubuntu-1/ ]]; then
     
         echo "On Kube-1, continuing..."
     
