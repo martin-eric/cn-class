@@ -1,4 +1,4 @@
-SCRIPTV="0.4"
+SCRIPTV="0.5"
 FILE=.swapoff
 FILE2=.binariesdone
 
@@ -23,11 +23,21 @@ else
   echo "Rebooting ....."
 fi
 
-if [ -f "$FILE2" ]; then
+if [ -f "$FILE2" ] ; then
 
-    echo "$FILE2 exists. Look like the cluster binaries are installed, starting the cluster for you..."
+    if [[(hostname -s) =~ /my-ubuntu-1/ ]]; then
     
-    yes | sudo kubeadm reset && sudo kubeadm init | tee .clusterstartoutput && sudo mkdir -p $HOME/.kube && sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config && sudo chown ericsson:ericsson $HOME/.kube/config
+        echo "On Kube-1, continuing..."
+    
+    else
+        echo "NOT ON KUBE-1, exitting..."
+        exit 1
+    
+    fi
+    
+    echo "$FILE2 exists. Look like the cluster binaries are installed, and executing on KUBE-1.... starting the cluster for you..."
+    
+    yes | sudo kubeadm reset && sudo kubeadm init && sudo mkdir -p $HOME/.kube && sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config && sudo chown ericsson:ericsson $HOME/.kube/config
     
     kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
     
