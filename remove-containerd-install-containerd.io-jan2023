@@ -40,7 +40,7 @@ echo \
 #Remove containerd if already installed
 
 sudo apt-mark unhold containerd
-sudo apt remove containerd
+sudo apt remove -y containerd
 sudo rm -rf /etc/containerd/config.toml
 
 #Install containerd from docker registry
