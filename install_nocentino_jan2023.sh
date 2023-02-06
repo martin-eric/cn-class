@@ -1,4 +1,4 @@
-SCRIPTV="0.5"
+SCRIPTV="0.6"
 FILE=.swapoff
 FILE2=.binariesdone
 
