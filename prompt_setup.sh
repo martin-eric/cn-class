@@ -1,7 +1,7 @@
 #!/bin/bash          
 
-SCRIPTV="0.4"
-FILE=".myself"
+SCRIPTV="0.5"
+FILE=.myself
 
 echo "Starting script version $SCRIPTV"
 
@@ -20,7 +20,7 @@ if [ -f "$FILE" ]; then
         if [[ ! $REPLY =~ ^[Yy]$ ]]
         then
                 echo "Cancelling ...."
-                exit 1
+                exit
         fi
 
 
@@ -38,7 +38,6 @@ NEWPS1="($name - $signum)"
 
 echo "your new prompt will be : $NEWPS1"
 
-
 read -p "Confirm the information looks correct ? (y or n) " -n 1 -r
 echo    # (optional) move to a new line
 if [[ ! $REPLY =~ ^[Yy]$ ]]
@@ -53,7 +52,5 @@ echo "$NEWPS1" > ~/.myself
 sed -i '/.myself/d' ~/.bashrc
 
 echo "if [ -f ~/.myself ]; then PS1=\"\$(cat ~/.myself) \$PS1\"; fi" >> ~/.bashrc
-
-. ~/.bashrc
 
 echo "Prompt modification complete. Please log out of every sessions and log back in..."
