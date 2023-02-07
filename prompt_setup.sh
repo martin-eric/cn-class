@@ -1,5 +1,7 @@
-set SCRIPTV="0.4"
-set FILE=".myself"
+#!/bin/bash          
+
+SCRIPTV="0.4"
+FILE=".myself"
 
 echo "Starting script version $SCRIPTV"
 
