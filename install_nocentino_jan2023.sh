@@ -1,4 +1,4 @@
-SCRIPTV="0.6"
+SCRIPTV="0.7"
 FILE=.swapoff
 FILE2=.binariesdone
 
@@ -14,13 +14,13 @@ if [ -f "$FILE" ]; then
     echo "$FILE exists. Continue"
 
 else
-    echo "$FILE does not exist. RELAUNCH install script after the reboot. Please login after you see the login prompt for this note on the console"
+    echo "$FILE does not exist. Updating SWAP. RELAUNCH this script after reboot."
         sudo swapoff -a
         sudo sed -i  's/\/swap/#\/swap/' /etc/fstab
         touch .swapoff
+        echo "Rebooting ..... "
         sleep 5
         sudo reboot
-  echo "Rebooting ....."
 fi
 
 if [ -f "$FILE2" ] ; then
@@ -30,8 +30,9 @@ if [ -f "$FILE2" ] ; then
         echo "On Kube-1, continuing..."
     
     else
+    
         echo "NOT ON KUBE-1, exitting..."
-        exit 1
+        exit
     
     fi
     
@@ -41,15 +42,17 @@ if [ -f "$FILE2" ] ; then
     
     kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
     
-    echo && echo && echo "Cluster initialize completed. You join command for your worker nodes is :"
+    echo && echo && echo "Cluster initialize completed. Your join command for your worker nodes is :" && echo && echo
     
     echo -n "sudo kubeadm reset ; sudo " && kubeadm token create --print-join-command
     
     exit
 
 else
+
     echo "$FILE2 does not exist. Installing all the binaries for your cluster"
-        sleep 5
+    sleep 5
+    
 fi
 
 # Installing all binaries, including latest containerd from docker repo 
