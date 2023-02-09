@@ -1,4 +1,4 @@
-SCRIPTV="0.6"
+SCRIPTV="0.7"
 FILE=.swapoff
 FILE2=.binariesdone
 FILE3=.containerdworkarounddone
@@ -56,7 +56,7 @@ sudo systemctl restart containerd
 
 echo "containerd workaround applied installed.... You are ready to manually initialize the cluster."
 
-VERSION=1.26.1-00
+VERSION=1.23.1-00
 sudo apt-mark unhold kubelet kubeadm kubectl 
 sudo apt-get install -y --allow-downgrades kubelet=$VERSION kubeadm=$VERSION kubectl=$VERSION
 sudo apt-mark hold kubelet kubeadm kubectl 
