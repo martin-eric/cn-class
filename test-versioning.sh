@@ -1,4 +1,4 @@
-SCRIPTV="0.5"
+SCRIPTV="0.6"
 FILE=.swapoff
 FILE2=.binariesdone
 FILE3=.containerdworkarounddone
@@ -38,7 +38,7 @@ sudo rm -rf /etc/containerd/config.toml
 
 #Install containerd from docker registry
 
-VERSION=1.6.16-1
+VERSION=1.5.11-1
 sudo apt-mark unhold containerd.io
 sudo apt-get update 
 sudo apt-get install -y --allow-downgrades containerd.io=$VERSION 
