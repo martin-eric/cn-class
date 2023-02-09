@@ -38,7 +38,7 @@ sudo rm -rf /etc/containerd/config.toml
 
 #Install containerd from docker registry
 
-VERSION=latest
+VERSION=1.6.4-1
 sudo apt-get update 
 sudo apt-get install -y --allow-downgrades containerd.io=$VERSION 
 sudo apt-mark hold containerd.io
@@ -63,3 +63,8 @@ sudo apt-mark hold kubelet kubeadm kubectl
 echo "Kubernetes binaries workaround applied installed.... You are ready to manually initialize the cluster."
 
 touch .containerdworkarounddone
+
+kubeadm version
+ctr version
+crictl -v
+
