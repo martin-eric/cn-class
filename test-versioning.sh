@@ -55,7 +55,7 @@ sudo systemctl restart containerd
 
 echo "containerd workaround applied installed.... You are ready to manually initialize the cluster."
 
-VERSION=1.24.3-00
+VERSION=1.26.1-00
 sudo apt-mark unhold kubelet kubeadm kubectl 
 sudo apt-get install -y --allow-downgrades kubelet=$VERSION kubeadm=$VERSION kubectl=$VERSION
 sudo apt-mark hold kubelet kubeadm kubectl 
@@ -64,22 +64,12 @@ echo "Kubernetes binaries workaround applied installed.... You are ready to manu
 
 touch .containerdworkarounddone
 
-kubeadm version
-ctr version
-crictl -v
 
     if [[ $(hostname) == "my-ubuntu-1" ]]; then
     
         echo "On Kube-1, continuing..."
-    
-    else
-    
-        echo "NOT ON KUBE-1, exitting..."
-        exit
-    
-    fi
-    
-    echo "Look like the cluster binaries are installed, and executing on KUBE-1.... starting the cluster for you..."
+        
+            echo "Look like the cluster binaries are installed, and executing on KUBE-1.... starting the cluster for you..."
     
     yes | sudo kubeadm reset && sudo kubeadm init && sudo mkdir -p $HOME/.kube && sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config && sudo chown ericsson:ericsson $HOME/.kube/config
     
@@ -87,8 +77,20 @@ crictl -v
     
     kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml
     
+    kubectl apply -f ./pod.yaml
+    
     echo && echo && echo "Cluster initialize completed. Your join command for your worker nodes is :" && echo && echo
     
-    echo -n "sudo kubeadm reset ; sudo " && kubeadm token create --print-join-command
+    echo -n "yes | sudo kubeadm reset ; sudo " && kubeadm token create --print-join-command
+    
+    else
+    
+        echo "NOT ON KUBE-1, exitting..." 
+           
+    fi
+    
+kubeadm version
+ctr version
+crictl -v
     
     exit
