@@ -1,4 +1,4 @@
-SCRIPTV="0.1"
+SCRIPTV="0.3"
 FILE=.swapoff
 FILE2=.binariesdone
 FILE3=.containerdworkarounddone
@@ -68,3 +68,27 @@ kubeadm version
 ctr version
 crictl -v
 
+    if [[ $(hostname) == "my-ubuntu-1" ]]; then
+    
+        echo "On Kube-1, continuing..."
+    
+    else
+    
+        echo "NOT ON KUBE-1, exitting..."
+        exit
+    
+    fi
+    
+    echo "Look like the cluster binaries are installed, and executing on KUBE-1.... starting the cluster for you..."
+    
+    yes | sudo kubeadm reset && sudo kubeadm init && sudo mkdir -p $HOME/.kube && sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config && sudo chown ericsson:ericsson $HOME/.kube/config
+    
+    # kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+    
+    kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml
+    
+    echo && echo && echo "Cluster initialize completed. Your join command for your worker nodes is :" && echo && echo
+    
+    echo -n "sudo kubeadm reset ; sudo " && kubeadm token create --print-join-command
+    
+    exit
