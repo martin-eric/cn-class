@@ -55,6 +55,8 @@ if [ -f "$FILE2" ] ; then
     
         echo "Binaries already installed, NOT ON KUBE-1, not attempting to start a new cluster"
         
+        echo "Please join this node to the cluster with the join command provided by the control plane node"
+        
         exit
     
     fi
@@ -62,7 +64,7 @@ if [ -f "$FILE2" ] ; then
 
 else
 
-    echo "$FILE2 does not exist. Installing all the binaries for your cluster"
+    echo "$FILE2 does not exist. Installing and configuring all the binaries needed for this node for a Kubernetes cluster"
     sleep 5
 
   #Installing all binaries, including latest containerd from docker repo
@@ -79,7 +81,7 @@ else
   EOF
 
 
-  'Setup required sysctl params, these persist across reboots.'
+  ##Setup required sysctl params, these persist across reboots.
   cat <<EOF | sudo tee /etc/sysctl.d/99-kubernetes-cri.conf
   net.bridge.bridge-nf-call-iptables  = 1
   net.ipv4.ip_forward                 = 1
@@ -100,13 +102,11 @@ else
   sudo mkdir -p /etc/apt/keyrings
   curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 
-
   #Use the following command to set up the repository:
 
   echo \
     "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
     $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-  
   
   #Remove containerd if already installed
 
@@ -121,8 +121,6 @@ else
   sudo apt-get install -y containerd.io
 
   sudo apt-mark hold containerd.io
-
-  # init your cluster or join your worker to CP as per Nocentino scripts/exercises files
 
   #Configure containerd
   sudo mkdir -p /etc/containerd
@@ -145,19 +143,13 @@ else
 
   #Update the package list 
   sudo apt-get update
-  apt-cache policy kubelet | head -n 20 
+  #apt-cache policy kubelet | head -n 20 
 
   #Install the required packages, if needed we can request a specific version. 
   #Pick the same version you used on the Control Plane Node in 0-PackageInstallation-containerd.sh
   VERSION=1.24.3-00
   sudo apt-get install -y kubelet=$VERSION kubeadm=$VERSION kubectl=$VERSION
   sudo apt-mark hold kubelet kubeadm kubectl containerd.io
-
-
-  #To install the latest, omit the version parameters
-  #sudo apt-get install kubelet kubeadm kubectl
-  #sudo apt-mark hold kubelet kubeadm kubectl
-
 
   #Ensure both are set to start when the system starts up.
   sudo systemctl enable kubelet.service
@@ -176,8 +168,7 @@ else
 
   fi
 
-  echo "If you want this script to do it for you, launch it again and it will do the following for you: initialize it, set-up your kubectl, and process the calico file for you"
-
+  echo "If you want this script initialize the cluster, launch it again and it will do the following for you: initialize it, set-up your kubectl, and process the calico file for you"
 
 fi
 
