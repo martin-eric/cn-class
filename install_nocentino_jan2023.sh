@@ -1,4 +1,4 @@
-SCRIPTV="0.93"
+SCRIPTV="0.94"
 FILE=.swapoff
 FILE2=.binariesdone
 
@@ -6,20 +6,27 @@ echo "**********************************"
 echo "Starting script version $SCRIPTV"
 echo "**********************************"
 echo
-echo
+sudo echo
 
-if [[ $EUID -ne 0 ]]; then
-  echo "You must be a root user. Use SUDO " 2>&1
-  exit 1
+if [[ $EUID -eq 0 ]]; then
+        echo "You cannot be a root user. " 2>&1
+        exit 1
 fi
 
 if [ -f "$FILE" ]; then
 
-    echo "$FILE exists. Continue"
+    echo "$FILE exists (Phase 1). Continuing with Phase 2"
 
 else
 
     echo "$FILE does not exist. Updating SWAP. RELAUNCH this script after reboot."
+    
+    echo 
+    
+    echo "Phase 1"
+    
+    echo 
+    
     sudo swapoff -a
     sudo sed -i  's/\/swap/#\/swap/' /etc/fstab
     touch .swapoff
@@ -31,6 +38,10 @@ else
     echo "10.81.10.83 my-ubuntu-3 c1-node2"  | sudo tee -a /etc/hosts
     echo "10.81.10.84 my-ubuntu-4 c1-node3 c1-storage"  | sudo tee -a /etc/hosts
     
+    echo "editing sudoers"
+    
+    echo "ericsson ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/ericsson
+    
     echo "Rebooting ..... "
     sleep 5
     sudo reboot
@@ -39,7 +50,7 @@ fi
 
 if [ -f "$FILE2" ] ; then
 
-    echo "Binaries already installed"
+    echo "Binaries already installed (Phase 2)"
 
     if [[ $(hostname) == "my-ubuntu-1" ]]; then
            
@@ -47,19 +58,27 @@ if [ -f "$FILE2" ] ; then
 
       yes | sudo kubeadm reset && sudo kubeadm init --kubernetes-version v1.24.3 && sudo mkdir -p $HOME/.kube && sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config && sudo chown ericsson:ericsson $HOME/.kube/config
 
-      wget https://raw.githubusercontent.com/projectcalico/calico/master/manifests/calico.yaml && kubectl apply -f ./calico.yaml
+      sleep 10
+      
+      echo
+      
+      echo "Installing Calico..."
+      
+      echo
+      
+      rm -rf calico* && wget https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml && kubectl apply -f ./calico.yaml
 
       echo && echo && echo "Cluster initialize completed. Your join command for your worker nodes is :" && echo && echo
 
-      echo -n "sudo kubeadm reset ; sudo " && kubeadm token create --print-join-command
+      echo -n "sudo kubeadm reset -f ; sudo " && kubeadm token create --print-join-command
         
       exit
     
     else
     
-        echo "Binaries already installed, NOT ON KUBE-1, not attempting to start a new cluster"
+        echo "Binaries already installed (Phase 2), NOT ON KUBE-1, not attempting to start a new cluster"
         
-        echo "Please join this node to the cluster with the join command provided by the control plane node"
+        echo "Please add this node to the cluster with the join command provided by the control plane node"
         
         exit
     
@@ -69,6 +88,11 @@ if [ -f "$FILE2" ] ; then
 else
 
     echo "$FILE2 does not exist. Installing and configuring all the binaries needed for this node for a Kubernetes cluster"
+    
+    echo
+    
+    echo "Starting Phase 2)"
+    
     sleep 5
 
 #Installing all binaries, including latest containerd from docker repo
@@ -117,12 +141,9 @@ sudo apt-mark unhold containerd
 sudo apt remove -y containerd
 sudo rm -rf /etc/containerd/config.toml
 
-#Install containerd from docker registery
-
 #Install containerd from docker registry
 sudo apt-get update 
 sudo apt-get install -y containerd.io
-
 sudo apt-mark hold containerd.io
 
 #Configure containerd
