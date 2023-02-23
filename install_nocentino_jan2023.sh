@@ -1,4 +1,4 @@
-SCRIPTV="0.7"
+SCRIPTV="0.9"
 FILE=.swapoff
 FILE2=.binariesdone
 
@@ -38,9 +38,9 @@ if [ -f "$FILE2" ] ; then
     
     echo "$FILE2 exists. Look like the cluster binaries are installed, and executing on KUBE-1.... starting the cluster for you..."
     
-    yes | sudo kubeadm reset && sudo kubeadm init && sudo mkdir -p $HOME/.kube && sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config && sudo chown ericsson:ericsson $HOME/.kube/config
+    yes | sudo kubeadm reset && sudo kubeadm init --kubernetes-version v1.24.3 && sudo mkdir -p $HOME/.kube && sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config && sudo chown ericsson:ericsson $HOME/.kube/config
     
-    kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+    wget https://raw.githubusercontent.com/projectcalico/calico/master/manifests/calico.yaml
     
     echo && echo && echo "Cluster initialize completed. Your join command for your worker nodes is :" && echo && echo
     
@@ -139,7 +139,7 @@ apt-cache policy kubelet | head -n 20
 
 #Install the required packages, if needed we can request a specific version. 
 #Pick the same version you used on the Control Plane Node in 0-PackageInstallation-containerd.sh
-VERSION=1.23.4-00
+VERSION=1.24.3-00
 sudo apt-get install -y kubelet=$VERSION kubeadm=$VERSION kubectl=$VERSION
 sudo apt-mark hold kubelet kubeadm kubectl containerd.io
 
