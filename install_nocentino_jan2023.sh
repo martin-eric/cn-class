@@ -1,4 +1,4 @@
-SCRIPTV="0.9"
+SCRIPTV="0.91"
 FILE=.swapoff
 FILE2=.binariesdone
 
@@ -41,10 +41,18 @@ if [ -f "$FILE2" ] ; then
     yes | sudo kubeadm reset && sudo kubeadm init --kubernetes-version v1.24.3 && sudo mkdir -p $HOME/.kube && sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config && sudo chown ericsson:ericsson $HOME/.kube/config
     
     wget https://raw.githubusercontent.com/projectcalico/calico/master/manifests/calico.yaml
+
+    echo "Installing completion bash for Kubernetes..."
     
+    sudo apt-get install -y bash-completion
+    echo "source <(kubectl completion bash)" >> ~/.bashrc
+
     echo && echo && echo "Cluster initialize completed. Your join command for your worker nodes is :" && echo && echo
     
     echo -n "sudo kubeadm reset ; sudo " && kubeadm token create --print-join-command
+    
+    #Ok, so now that we're tired of typing commands out, let's enable bash auto-complete of our kubectl commands
+    
     
     exit
 
