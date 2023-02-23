@@ -26,35 +26,27 @@ fi
 if [ -f "$FILE2" ] ; then
 
     if [[ $(hostname) == "my-ubuntu-1" ]]; then
-    
-        echo "On Kube-1, continuing..."
+           
+      echo "$FILE2 exists. Look like the cluster binaries are installed, and executing on KUBE-1.... starting the cluster for you..."
+
+      yes | sudo kubeadm reset && sudo kubeadm init --kubernetes-version v1.24.3 && sudo mkdir -p $HOME/.kube && sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config && sudo chown ericsson:ericsson $HOME/.kube/config
+
+      wget https://raw.githubusercontent.com/projectcalico/calico/master/manifests/calico.yaml && kubectl apply -f ./calico.yaml
+
+      echo && echo && echo "Cluster initialize completed. Your join command for your worker nodes is :" && echo && echo
+
+      echo -n "sudo kubeadm reset ; sudo " && kubeadm token create --print-join-command
+        
+      exit
     
     else
     
-        echo "NOT ON KUBE-1, exitting..."
+        echo "Binaries already installed, NOT ON KUBE-1, hence all done here!"
+        
         exit
     
     fi
     
-    echo "$FILE2 exists. Look like the cluster binaries are installed, and executing on KUBE-1.... starting the cluster for you..."
-    
-    yes | sudo kubeadm reset && sudo kubeadm init --kubernetes-version v1.24.3 && sudo mkdir -p $HOME/.kube && sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config && sudo chown ericsson:ericsson $HOME/.kube/config
-    
-    wget https://raw.githubusercontent.com/projectcalico/calico/master/manifests/calico.yaml
-
-    echo "Installing completion bash for Kubernetes..."
-    
-    sudo apt-get install -y bash-completion
-    echo "source <(kubectl completion bash)" >> ~/.bashrc
-
-    echo && echo && echo "Cluster initialize completed. Your join command for your worker nodes is :" && echo && echo
-    
-    echo -n "sudo kubeadm reset ; sudo " && kubeadm token create --print-join-command
-    
-    #Ok, so now that we're tired of typing commands out, let's enable bash auto-complete of our kubectl commands
-    
-    
-    exit
 
 else
 
@@ -63,10 +55,11 @@ else
     
 fi
 
-# Installing all binaries, including latest containerd from docker repo 
+' Installing all binaries, including latest containerd from docker repo'
 
-#Install a container runtime - containerd
-#containerd prerequisites, first load two modules and configure them to load on boot
+'Install a container runtime - containerd'
+'containerd prerequisites, first load two modules and configure them to load on boot'
+
 sudo modprobe overlay
 sudo modprobe br_netfilter
 
@@ -76,7 +69,7 @@ br_netfilter
 EOF
 
 
-#Setup required sysctl params, these persist across reboots.
+'Setup required sysctl params, these persist across reboots.'
 cat <<EOF | sudo tee /etc/sysctl.d/99-kubernetes-cri.conf
 net.bridge.bridge-nf-call-iptables  = 1
 net.ipv4.ip_forward                 = 1
@@ -93,7 +86,6 @@ sudo sysctl --system
 ## To be done on both CP and worker nodes
 
 #Add Docker’s official GPG key:
-
 
 sudo mkdir -p /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
@@ -165,5 +157,15 @@ echo "kubernetes binaries all installed.... You are ready to manually initialize
 
 touch .binariesdone
 
+if [[ $(hostname) == "my-ubuntu-1" ]]; then
+
+      echo "Installing completion bash for Kubernetes..."
+
+      sudo apt-get install -y bash-completion
+      echo "source <(kubectl completion bash)" >> ~/.bashrc
+
+fi
+
 echo "If you want this script to do it for you, launch it again and it will do the following for you: initialize it, set-up your kubectl, and process the calico file for you"
 
+exit
