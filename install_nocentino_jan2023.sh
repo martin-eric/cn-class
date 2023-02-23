@@ -158,7 +158,9 @@ sudo apt-mark hold kubelet kubeadm kubectl containerd.io
 sudo systemctl enable kubelet.service
 sudo systemctl enable containerd.service
 
+echo
 echo "kubernetes binaries all installed.... You are ready to manually initialize the cluster."
+echo
 
 touch .binariesdone
 
@@ -171,7 +173,9 @@ touch .binariesdone
 
   fi
 
+echo
 echo "If you want this script initialize the cluster, launch it again and it will do the following for you: initialize it, set-up your kubectl, and process the calico file for you"
+echo
 
 fi
 
