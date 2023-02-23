@@ -67,27 +67,26 @@ else
     echo "$FILE2 does not exist. Installing and configuring all the binaries needed for this node for a Kubernetes cluster"
     sleep 5
 
-  #Installing all binaries, including latest containerd from docker repo
+#Installing all binaries, including latest containerd from docker repo
 
-  #Install a container runtime - containerd
-  #containerd prerequisites, first load two modules and configure them to load on boot
+#Install a container runtime - containerd
+#containerd prerequisites, first load two modules and configure them to load on boot
 
-  sudo modprobe overlay
-  sudo modprobe br_netfilter
+sudo modprobe overlay
+sudo modprobe br_netfilter
 
-  cat <<EOF | sudo tee /etc/modules-load.d/containerd.conf
-  overlay
-  br_netfilter
-  EOF
+cat <<EOF | sudo tee /etc/modules-load.d/containerd.conf
+overlay
+br_netfilter
+EOF
 
 
-  ##Setup required sysctl params, these persist across reboots.
-  cat <<EOF | sudo tee /etc/sysctl.d/99-kubernetes-cri.conf
-  net.bridge.bridge-nf-call-iptables  = 1
-  net.ipv4.ip_forward                 = 1
-  net.bridge.bridge-nf-call-ip6tables = 1
-  EOF
-
+##Setup required sysctl params, these persist across reboots.
+cat <<EOF | sudo tee /etc/sysctl.d/99-kubernetes-cri.conf
+net.bridge.bridge-nf-call-iptables  = 1
+net.ipv4.ip_forward                 = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+EOF
 
   #Apply sysctl params without reboot
   sudo sysctl --system
