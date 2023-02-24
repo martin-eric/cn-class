@@ -1,4 +1,4 @@
-SCRIPTV="0.95"
+SCRIPTV="0.95-1.26.0"
 FILE=.swapoff
 FILE2=.binariesdone
 
@@ -60,11 +60,14 @@ if [ -f "$FILE2" ] ; then
 
     echo "Binaries already installed (Phase 2)"
 
-    if [[ $(hostname) == "my-ubuntu-1" ]]; then
+    if [[ $(hostname) == "my-ubuntu-1" ]] || [[ $(hostname) == "c1-cp1" ]]; then
            
       echo "$FILE2 exists. Look like the cluster binaries are installed, and executing on KUBE-1.... starting a new cluster for you... (Phase 3)"
 
-      yes | sudo kubeadm reset && sudo kubeadm init --kubernetes-version v1.24.3 && sudo mkdir -p $HOME/.kube && sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config && sudo chown ericsson:ericsson $HOME/.kube/config
+      yes | sudo kubeadm reset && sudo kubeadm init --kubernetes-version v1.26.0 && sudo mkdir -p $HOME/.kube && sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config && sudo chown ericsson:ericsson $HOME/.kube/config
+
+#      yes | sudo kubeadm reset && sudo kubeadm init --kubernetes-version v1.24.3 && sudo mkdir -p $HOME/.kube && sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config && sudo chown ericsson:ericsson $HOME/.kube/config
+
 
       sleep 10
       
@@ -182,7 +185,9 @@ sudo apt-get update
 
 #Install the required packages, if needed we can request a specific version. 
 #Pick the same version you used on the Control Plane Node in 0-PackageInstallation-containerd.sh
-VERSION=1.24.3-00
+VERSION=1.26.0-00
+#VERSION=1.24.3-00
+
 sudo apt-get install -y kubelet=$VERSION kubeadm=$VERSION kubectl=$VERSION
 sudo apt-mark hold kubelet kubeadm kubectl containerd.io
 
