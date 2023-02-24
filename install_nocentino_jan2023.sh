@@ -1,4 +1,4 @@
-SCRIPTV="0.94"
+SCRIPTV="0.95"
 FILE=.swapoff
 FILE2=.binariesdone
 
@@ -42,6 +42,14 @@ else
     
     echo "ericsson ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/ericsson
     
+    echo
+    
+    echo "Turning off Auto Upgrade of Ubuntu"
+    
+    sudo sed -i 's/"1"/"0"/g;' /etc/apt/apt.conf.d/20auto-upgrades
+    
+    echo
+    
     echo "Rebooting ..... "
     sleep 5
     sudo reboot
@@ -54,7 +62,7 @@ if [ -f "$FILE2" ] ; then
 
     if [[ $(hostname) == "my-ubuntu-1" ]]; then
            
-      echo "$FILE2 exists. Look like the cluster binaries are installed, and executing on KUBE-1.... starting a new cluster for you..."
+      echo "$FILE2 exists. Look like the cluster binaries are installed, and executing on KUBE-1.... starting a new cluster for you... (Phase 3)"
 
       yes | sudo kubeadm reset && sudo kubeadm init --kubernetes-version v1.24.3 && sudo mkdir -p $HOME/.kube && sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config && sudo chown ericsson:ericsson $HOME/.kube/config
 
@@ -71,6 +79,8 @@ if [ -f "$FILE2" ] ; then
       echo && echo && echo "Cluster initialize completed. Your join command for your worker nodes is :" && echo && echo
 
       echo -n "sudo kubeadm reset -f ; sudo " && kubeadm token create --print-join-command
+      
+      touch .clusterstarted
         
       exit
     
@@ -91,7 +101,7 @@ else
     
     echo
     
-    echo "Starting Phase 2)"
+    echo "Starting Phase 2"
     
     sleep 5
 
@@ -127,6 +137,7 @@ sudo sysctl --system
 #Add Docker’s official GPG key:
 
 sudo mkdir -p /etc/apt/keyrings
+sudo rm -rf /etc/apt/keyrings/docker.gpg
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 
 #Use the following command to set up the repository:
