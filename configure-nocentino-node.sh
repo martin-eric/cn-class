@@ -3,6 +3,7 @@
 SCRIPTV="0.1"
 FILE=.swapoff
 FILE2=.binariesdone
+FILE3=.clusterstarted
 
 echo "**********************************"
 echo "Starting script version $SCRIPTV"
@@ -13,6 +14,14 @@ sudo echo
 if [[ $EUID -eq 0 ]]; then
         echo "You cannot be a root user. " 2>&1
         exit 1
+fi
+
+if [ -f "$FILE3" ]; then
+
+    echo "Cluster already started on Control Plane.... Nothing to do... Exiting"
+
+        exit 0;
+    
 fi
 
 if [ -f "$FILE" ]; then
