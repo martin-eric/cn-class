@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPTV="0.1"
+SCRIPTV="0.2"
 FILE=.swapoff
 FILE2=.binariesdone
 FILE3=.clusterstarted
