@@ -312,7 +312,7 @@ metadata:
 spec:
   type: LoadBalancer
   ports:
-  - port: 9090
+  - port: 8181
     targetPort: 8079
     nodePort: 30001
   selector:
